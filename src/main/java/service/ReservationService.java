@@ -19,6 +19,7 @@ import repository.dao.UserDao;
 import util.Pair;
 
 import java.time.Instant;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -76,7 +77,17 @@ public class ReservationService {
   public List<Reservation> getTopNMostExpensive(
       ReservationDao reservationDao, Instant from, Instant to, int n)
       throws InvalidDateRangeException, DataAccessException {
-    throw new UnsupportedOperationException("Ejercicio 3: implement getTopNMostExpensive");
+    if (from == null || to == null || from.isAfter(to)) {
+      throw new InvalidDateRangeException("Rango de fechas inválido");
+    }
+    if (n <= 0) {
+      return List.of();
+    }
+    List<Reservation> reservations = reservationDao.findByDateRange(from, to);
+    return reservations.stream()
+        .sorted(Comparator.comparingDouble(Reservation::calculatePrice).reversed())
+        .limit(n)
+        .toList();
   }
 
   // Ejercicio 5
@@ -99,14 +110,29 @@ public class ReservationService {
     throw new UnsupportedOperationException("Ejercicio 7: implement createReservation");
   }
 
-  // Ejercicio 8
+    // Ejercicio 8
   public Reservation addReservationIfNotDuplicate(
       List<Reservation> existingReservations,
       Reservation newReservation,
       ReservationDao reservationDao)
       throws DuplicateReservationException, DataAccessException {
-    throw new UnsupportedOperationException("Ejercicio 8: implement addReservationIfNotDuplicate");
+
+    String newUserId = newReservation.getOwner().getId();
+    String newServiceId = newReservation.getService().getId();
+
+    boolean isDuplicate = existingReservations.stream()
+        .anyMatch(r -> r.getOwner().getId().equals(newUserId) &&
+                       r.getService().getId().equals(newServiceId));
+
+    if (isDuplicate) {
+      throw new DuplicateReservationException(newUserId, newServiceId);
+    }
+
+    reservationDao.save(newReservation);
+    
+    return newReservation;
   }
+  
 
   // Ejercicio 10
   public void exportReservationsToCsv(
