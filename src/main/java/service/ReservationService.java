@@ -70,7 +70,13 @@ public class ReservationService {
   public List<Reservation> getReservationsByUser(
       List<Reservation> reservations, String username, UserDao userDao)
       throws UserNotFoundException, DataAccessException {
-    throw new UnsupportedOperationException("Ejercicio 1: implement getReservationsByUser");
+    User user =
+        userDao.findByUsername(username).orElseThrow(() -> new UserNotFoundException(username));
+
+    return reservations.stream()
+        .filter(reservation -> reservation.getOwner().getUsername().equals(user.getUsername()))
+        .sorted(Comparator.comparingDouble(Reservation::calculatePrice).reversed())
+        .toList();
   }
 
   // Ejercicio 3
