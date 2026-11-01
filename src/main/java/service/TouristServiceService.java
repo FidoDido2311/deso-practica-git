@@ -20,7 +20,7 @@ public class TouristServiceService {
         .filter(service -> service.getCompany().equalsIgnoreCase(company))
         .mapToDouble(TouristService::calculatePrice)
         .average()
-        .orElseThrow(() -> new ServiceNotFoundException("No services found for company: " + company));
+       .orElseThrow(() -> new ServiceNotFoundException(company));
   }
 
 
