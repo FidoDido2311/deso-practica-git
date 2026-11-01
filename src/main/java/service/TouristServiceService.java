@@ -11,6 +11,7 @@ import java.util.List;
 public class TouristServiceService {
 
   
+
   // Ejercicio 2
   public double getAveragePriceByCompany(List<TouristService> services, String company)
       throws ServiceNotFoundException {
@@ -21,6 +22,7 @@ public class TouristServiceService {
         .average()
         .orElseThrow(() -> new ServiceNotFoundException("No services found for company: " + company));
   }
+
 
 
   // Ejercicio 4
